@@ -1,0 +1,14 @@
+name: air-quality
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - duckdb
+  - pandas
+  - matplotlib
+  - kaggle
+  - ipython
+  - openai
+  - streamlit
+  - tabulate
+  - pip
