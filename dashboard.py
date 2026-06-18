@@ -19,6 +19,31 @@ load_env_file(PROJECT_ROOT / ".env")
 logger = logging.getLogger(__name__)
 
 
+def load_deployment_secrets() -> None:
+    for key in ("OPENAI_API_KEY", "OPENAI_MODEL", "APP_ACCESS_CODE"):
+        try:
+            value = st.secrets.get(key)
+        except Exception:
+            value = None
+
+        if value and key not in os.environ:
+            os.environ[key] = str(value)
+
+
+def require_access_code() -> None:
+    expected_code = os.getenv("APP_ACCESS_CODE")
+    if not expected_code:
+        return
+
+    provided_code = st.text_input("Access code", type="password")
+    if provided_code != expected_code:
+        st.info("Enter the access code to use this dashboard.")
+        st.stop()
+
+
+load_deployment_secrets()
+
+
 DEFAULT_QUESTION = "Which Indian city has the worst air quality?"
 EXAMPLE_QUESTIONS = [
     DEFAULT_QUESTION,
@@ -37,6 +62,7 @@ st.set_page_config(
 )
 
 st.title("Air Quality Analyst")
+require_access_code()
 
 with st.sidebar:
     db_path = st.text_input("DuckDB path", value="warehouse/air_quality.duckdb")
